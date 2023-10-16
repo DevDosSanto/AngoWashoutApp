@@ -9,6 +9,15 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var environment = builder.Environment.EnvironmentName; // Obtém o nome do ambiente atual
+
+var configBuilder = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
+IConfiguration configuration = configBuilder.Build();
+
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
 ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -18,7 +27,7 @@ builder.Services.AddDbContext<Context>(options =>
 options.UseSqlServer(connectionString));
 
 builder.Services.AddScoped<JWTServices>();
-
+kt
 builder.Services.AddIdentityCore<User>(options =>
 {
     options.Password.RequireNonAlphanumeric = false;
